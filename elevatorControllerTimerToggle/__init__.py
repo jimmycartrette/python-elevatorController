@@ -8,6 +8,7 @@ import azure.functions as func
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     action = req.params.get('action')
+    logging.info("received request for "+action)
     validActions = ['enable', 'disable', 'status']
     if action == None or action not in validActions:
         return "no action specified"
@@ -37,7 +38,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if action == 'status':
         status = r.json()['properties']['AzureWebJobs.' +
                                         functiontotoggle+'.Disabled']
-        statusreturn = {'enabled': 'true' if status == '0' else 'false'}
+        statusreturn = {'enabled': True if status == '0' else False}
         return json.dumps(statusreturn, indent=4, separators=(',', ': '))
 
     currentsettings = r.json()['properties']
