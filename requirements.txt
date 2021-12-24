@@ -7,4 +7,4 @@ azure-functions-durable
 requests
 adal
 azure.messaging.webpubsubservice
-#azure.core.credentials
+azure.cosmos
