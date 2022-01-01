@@ -1,14 +1,7 @@
-# This function is not intended to be invoked directly. Instead it will be
-# triggered by an orchestrator function.
-# Before running this sample, please:
-# - create a Durable orchestration function
-# - create a Durable HTTP starter function
-# - add azure-functions-durable to requirements.txt
-# - run pip install -r requirements.txt
-
 import logging
 from random import randint, random
 from typing import Sequence
+from azure import functions
 from azure.messaging.webpubsubservice import WebPubSubServiceClient
 from azure.core.credentials import AzureKeyCredential
 import azure.cosmos.cosmos_client as cosmos_client
@@ -40,13 +33,14 @@ class ElevatorState:
         self.primaryElevatorQueue = primaryElevatorQueue
         self.secondaryElevatorQueue = secondaryElevatorQueue
         self.id = id
+        self.elevatorNumber = id
         self.elevatorStatus = elevatorStatus
         self.elevatorDirection = elevatorDirection
 
 
-def main(payload: object) -> str:
-    elevator_id = payload['elevatorId']
-    number_of_floors = payload['numberOfFloors']
+def main(req: functions.HttpRequest) -> functions.HttpResponse:
+    elevator_id = req.params.get('id')
+    number_of_floors = int(req.params.get('numberOfFloors'))
     changed = False
     client = cosmos_client.CosmosClient(COSHOST, {'masterKey': COSMASTER_KEY})
     elevators_db = client.get_database_client(database=COSDATABASE_ID)
@@ -56,17 +50,15 @@ def main(payload: object) -> str:
     try:
         elevator_status = elevators_container.read_item(
             item=str(elevator_id), partition_key=str(elevator_id))
+        elevator_status['elevatorNumber'] = int(elevator_id)
     except Exception as e:
         logging.warning("elevator "+str(elevator_id)+" not found")
-        # elevator_status = {'id': str(elevator_id), 'atFloor': 1,                           'elevatorStatus': ElevatorStatus.ATFLOOR, 'elevatorDirection': ElevatorDirection.NONE, 'primaryElevatorQueue': {}, 'secondaryElevatorQueue': {}}
+
         elevator_status = ElevatorState(1, {}, {}, str(
             elevator_id), ElevatorStatus.ATFLOOR, ElevatorDirection.NONE)
         changed = True
 
-    # elevators_door_query = "SELECT * FROM c WHERE c.open ==1"
-    # elevator_doors_status = elevator_doors_container.query_items()
-
-    priqueue = elevator_status.primaryElevatorQueue
+    priqueue = elevator_status['primaryElevatorQueue']
     secqueue = elevator_status['secondaryElevatorQueue']
     create_queue = randint(0, 9)
     random_floor = randint(1, number_of_floors)
@@ -114,5 +106,4 @@ def main(payload: object) -> str:
                                          hub='elevator', credential=AzureKeyCredential("sx3EtHYQQxPZiAZuHYDiEkDCflnI24Q00M7MJmCCg1k="))
         service.send_to_all(
             message={'elevatorUpdate': elevator_status, 'doorsUpdate': elevator_doors_status})
-
-    return elevator_status
+    return functions.HttpResponse("whatever")
