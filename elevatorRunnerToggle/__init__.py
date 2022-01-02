@@ -5,6 +5,16 @@ import json
 import adal
 import azure.functions as func
 
+tenant = os.environ['TENANT']
+authority_url = 'https://login.microsoftonline.com/' + tenant
+client_id = os.environ['CLIENTID']
+client_secret = os.environ['CLIENTSECRET']
+resource = 'https://management.azure.com/'
+subscription = os.environ['SUBSCRIPTION']
+resourcegroup = os.environ['RESOURCEGROUP']
+functionappname = os.environ['FUNCTIONAPPNAME']
+functiontotoggle = os.environ['FUNCTIONTOTOGGLE']
+
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     action = req.params.get('action')
@@ -13,15 +23,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if action == None or action not in validActions:
         return "no action specified"
 
-    tenant = os.environ['TENANT']
-    authority_url = 'https://login.microsoftonline.com/' + tenant
-    client_id = os.environ['CLIENTID']
-    client_secret = os.environ['CLIENTSECRET']
-    resource = 'https://management.azure.com/'
-    subscription = os.environ['SUBSCRIPTION']
-    resourcegroup = os.environ['RESOURCEGROUP']
-    functionappname = os.environ['FUNCTIONAPPNAME']
-    functiontotoggle = os.environ['FUNCTIONTOTOGGLE']
     context = adal.AuthenticationContext(authority_url)
     token = context.acquire_token_with_client_credentials(
         resource, client_id, client_secret)
@@ -33,7 +34,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     puturl = 'https://management.azure.com/subscriptions/'+subscription+'/resourceGroups/'+resourcegroup + \
         '/providers/Microsoft.Web/sites/'+functionappname + \
         '/config/appsettings?api-version=2019-08-01'
-    # POST /subscriptions/<>/resourceGroups/<group name>/providers/Microsoft.Web/sites/<function app name>/config/appsettings/list?api-version=2019-08-01
     r = requests.post(listurl, headers=headers)
     if action == 'status':
         status = r.json()['properties']['AzureWebJobs.' +
