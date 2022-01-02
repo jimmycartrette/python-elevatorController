@@ -107,3 +107,5 @@ def main(req: functions.HttpRequest) -> functions.HttpResponse:
         service.send_to_all(
             message={'elevatorUpdate': elevator_status, 'doorsUpdate': elevator_doors_status})
     return functions.HttpResponse("whatever")
+
+# cause deploy
