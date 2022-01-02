@@ -116,20 +116,6 @@ def main(req: functions.HttpRequest) -> functions.HttpResponse:
             else:
                 elevator_status['atFloor'] -= 1
 
-        # if "atFloor" in elevator_status and priqueue['toFloor'] == elevator_status['atFloor']:
-        #     elevator_status['elevatorDirection'] = ElevatorDirection.NONE
-        #     elevator_status['elevatorStatus'] = ElevatorStatus.DOORSOPENING
-        #     elevator_status['primaryElevatorQueue'] = elevator_status['secondaryElevatorQueue']
-        #     elevator_status['secondaryElevatorQueue'] = {}
-        # elif priqueue['toFloor'] > elevator_status['atFloor']:
-        #     elevator_status['elevatorStatus'] = ElevatorStatus.MOVING
-        #     elevator_status['elevatorDirection'] = ElevatorDirection.UP
-        #     elevator_status['atFloor'] = elevator_status['atFloor']+1
-        # elif priqueue['toFloor'] < elevator_status['atFloor']:
-        #     elevator_status['elevatorStatus'] = ElevatorStatus.MOVING
-        #     elevator_status['elevatorDirection'] = ElevatorDirection.DOWN
-        #     elevator_status['atFloor'] = elevator_status['atFloor']-1
-
     if changed == True:
         elevator_doors_status = []
         for x in range(1, number_of_floors+1):
