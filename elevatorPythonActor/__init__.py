@@ -94,7 +94,7 @@ def main(req: functions.HttpRequest) -> functions.HttpResponse:
 
     elevator_doors_status = []
     for x in range(1, number_of_floors+1):
-        adddoor = {'elevatorShaftNumber': elevator_id, 'floor': x,
+        adddoor = {'elevatorShaftNumber': int(elevator_id), 'floor': x,
                    'open': True if elevator_status['elevatorStatus'] == ElevatorStatus.DOORSOPENING and x == elevator_status['atFloor'] else False,
                    'elevatorAtFloor': original_at_floor,
                    'elevatorDirection': elevator_status['elevatorDirection']}
