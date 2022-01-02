@@ -32,7 +32,10 @@ class ElevatorStatus(enum.IntEnum):
 def main(mytimer: func.TimerRequest) -> None:
     for e in range(1, NUMBER_OF_ELEVATORS+1):
         try:
-            nothing = requests.get(ELEVATORPYTHONACTOR+"?id="+str(e) +
-                                   "&numberOfFloors="+str(NUMBER_OF_FLOORS), timeout=0.0000000001)
+
+            elevatorActorURL = ELEVATORPYTHONACTOR+"?id="+str(e) + \
+                "&numberOfFloors="+str(NUMBER_OF_FLOORS)
+            logging.debug("going to call "+elevatorActorURL)
+            nothing = requests.get(elevatorActorURL, timeout=0.0000000001)
         except requests.exceptions.ReadTimeout:
             pass
