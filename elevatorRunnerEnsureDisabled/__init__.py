@@ -10,4 +10,4 @@ def main(mytimer: func.TimerRequest) -> None:
     r = requests.get(turnoffurl)
     logging.info(r.text)
 
-# make deploy
+# make deploy2
