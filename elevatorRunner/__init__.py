@@ -10,6 +10,7 @@ import azure.functions as func
 import azure.durable_functions as df
 import azure.cosmos.cosmos_client as cosmos_client
 import azure.cosmos.exceptions as exceptions
+import multiprocessing
 
 COSHOST = os.environ['COSHOST']
 COSMASTER_KEY = os.environ['COSMASTER_KEY']
@@ -30,12 +31,12 @@ class ElevatorStatus(enum.IntEnum):
 
 
 def main(mytimer: func.TimerRequest) -> None:
+    p = multiprocessing.Pool(processes=4)
     for e in range(1, NUMBER_OF_ELEVATORS+1):
         try:
-
             elevatorActorURL = ELEVATORPYTHONACTOR+"?id="+str(e) + \
                 "&numberOfFloors="+str(NUMBER_OF_FLOORS)
             logging.debug("going to call "+elevatorActorURL)
-            nothing = requests.get(elevatorActorURL, timeout=0.0000000001)
+            p.apply_async(requests.get(elevatorActorURL))
         except requests.exceptions.ReadTimeout:
             pass
